@@ -76,59 +76,14 @@ We follow separation of concerns:
 
 - **Utils**: Shared logic for util helpers.
 
-- **Routes**:
-
-  - `/inbox`: Displays a list of available phone numbers.
-  - `/inbox/:phoneNumberId`: Lists conversations associated with a selected number.
-  - `/inbox/:phoneNumberId/conversation/:conversationId`: Chat interface to send and receive messages.
-
 ### Backend (Mocked)
 
 Stack: Node.js + Express.js + TypeScript
-
-A lightweight proxy that:
-
-- Exposes RESTful routes.
-- Injects the third-party messaging API key in headers.
-- Handles GET /phone-numbers, GET /messages, and POST /messages.
-- Prevents frontend CORS and security issues
 
 Note:
 
 - All routes currently return mocked data to simulate interaction
 - Real API logic is commented out and not active
-
-#### Data Flow:
-
-1. User selects a conversation (between two known numbers).
-2. Messages are fetched via paginated `/api/messages` with `nextPageToken`.
-3. On scroll-up, more messages load with scroll preserved.
-4. Outgoing messages are sent optimistically and updated based on response.
-5. New messages are polled periodically and deduplicated before merging.
-
-## Trade offs
-
-- **Polling instead of WebSockets**: Went with polling (5s) to reduce complexity. It avoids socket setup and lifecycle bugs while being reliable for messaging. In production, we’d likely use sockets or SSE to minimize latency and reduce backend polling load.
-- **Optimistic UI**: Outbound messages render instantly for smooth UX. Comes with trade-offs like local deduplication and potential delivery mismatch, but greatly improves responsiveness.
-- **Pagination vs. Full Load**: Scroll up pagination with `nextPageToken` avoids overfetching. Virtualization wasn’t needed for this volume and would cause extra overhead/complexity.
-- **Manual Scroll Preservation**: Preserved scroll position after paginated loads by calculating offset differences. Keeps user position stable while loading older messages without visual jank.
-- **No Scroll-to-Bottom on Polling**: New incoming messages don’t scroll-to-bottom. Prevents interrupting users reviewing previous content. Only auto-scrolls on initial load.
-- **Minimal State Management**: No Redux or global stores. Scoped state and composable hooks (useMessages, useSendMessage) were sufficient and low overhead.
-
-### Assumptions
-
-- **Hardcoded Conversations**: Third-party messaging API conversations endpoint doesn’t support filtering by external number. To simulate a real conversation, hardcoded known test participants and skipped /conversations.
-- **No Auth Layer**: Used static API key injected via proxy. A real app would require scoped keys, token auth, and CORS hardening.
-- **Polling every 5 seconds**: 5s interval assumed to be acceptable. In production, adaptive polling or socket fallback strategies could be introduced.
-- **No Offline Support or Queue for Failures**: For scope reasons, features like local draft caching or offline send queues are out of scope. In production, we would explore the use of DeadLetter Queues or local storage for offline support. We would also consider the use of retry / exponential backoff for failed messages.
-
-### Backend Server Routes
-
-| HTTP Verb | Endpoint             | Function          | Description                                                               |
-| --------- | -------------------- | ----------------- | ------------------------------------------------------------------------- |
-| `GET`     | `/api/phone-numbers` | `getPhoneNumbers` | Lists available phone numbers from the messaging service                  |
-| `GET`     | `/api/messages`      | `getMessages`     | Retrieves messages for a conversation between the number and participants |
-| `POST`    | `/api/messages`      | `sendMessage`     | Sends a text message to a recipient                                       |
 
 🛠️ Built for demonstration purposes. No real data or credentials required.  
 Feel free to fork, adapt, or extend for your own projects.
