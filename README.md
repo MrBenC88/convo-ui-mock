@@ -2,7 +2,9 @@
 
 A responsive, full-featured chat UI simulating a real messaging experience with mocked API data and a lightweight Express proxy.
 
-> ⚠️ This is a standalone demo project using mocked API data. All interactions are simulated for frontend showcase purposes.
+> ⚠️ This is a standalone demo project using mocked API data. All interactions are simulated for frontend showcase purposes. This is a self-built frontend chat demo using mocked data. It was inspired by a take-home prompt I received, but it contains no proprietary code, logic, or API credentials.
+
+
 
 ## Screenshots
 
